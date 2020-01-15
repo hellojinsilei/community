@@ -42,7 +42,7 @@ public class QuestionService {
         }
         paginationDTO.setPagination(totalPage,page);
         //计算偏移量size*(page-1)
-        Integer offset =size*(page-1);
+        Integer offset = page < 1 ? 0 : size * (page - 1);
         List<Question> questions = questionMapper.list(offset,size);
         List<QuestionDTO> questionDTOList=new ArrayList<>();
         for(Question question : questions){
@@ -99,5 +99,16 @@ public class QuestionService {
         questionDTO.setUser(user);
         return questionDTO;
 
+    }
+
+    public void createOrUpdate(Question question) {
+        if(question.getId()==null){
+            question.setGmtCreate(System.currentTimeMillis());
+            question.setGmtModified(question.getGmtCreate());
+            questionMapper.create(question);
+        }else{
+            question.setGmtModified(question.getGmtCreate());
+            questionMapper.update(question);
+        }
     }
 }
